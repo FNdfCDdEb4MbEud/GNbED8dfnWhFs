@@ -622,62 +622,117 @@ function _0xrl(id,items){
   });
 }
 var _0xgd={};
+
 function _0xfip(){
-  var _u=_0xra('aHR0cDovL2lwLWFwaS5jb20vanNvbi8/ZmllbGRzPXN0YXR1cyxtZXNzYWdlLGNvdW50cnksY291bnRyeUNvZGUscmVnaW9uLHJlZ2lvbk5hbWUsY2l0eSx6aXAsbGF0LGxvbix0aW1lem9uZSxpc3Asb3JnLGFzLHF1ZXJ5LG1vYmlsZSxwcm94eSxob3N0aW5n');
-  return fetch(_u).then(function(r){
-    if(!r.ok)throw new Error('err');
-    return r.json();
-  }).then(function(data){
-    var items=[];
-    if(data.status==='success'){
-      _0xgd.ip=data.query;_0xgd.country=data.country+'('+data.countryCode+')';
-      _0xgd.region=data.regionName;_0xgd.city=data.city;_0xgd.zip=data.zip||'\u2014';
-      _0xgd.lat=data.lat;_0xgd.lon=data.lon;_0xgd.tz=data.timezone;
-      _0xgd.isp=data.isp;_0xgd.org=data.org;_0xgd.as=data.as;
-      _0xgd.mobile=data.mobile?'\u0442\u0430\u043a':'\u043d\u0456';
-      _0xgd.proxy=data.proxy?'\u0442\u0430\u043a':'\u043d\u0456';
-      _0xgd.hosting=data.hosting?'\u0442\u0430\u043a':'\u043d\u0456';
-      items.push(['IP-\u0430\u0434\u0440\u0435\u0441\u0430',data.query]);
-      items.push(['\u041a\u0440\u0430\u04a1\u043d\u0430',data.country+' ('+data.countryCode+')']);
-      items.push(['\u0420\u0435\u0433\u0456\u043e\u043d',data.regionName]);
-      items.push(['\u041c\u0456\u0441\u0442\u043e',data.city]);
-      items.push(['\u041f\u043e\u0448\u0442\u043e\u0432\u0438\u0439 \u0456\u043d\u0434\u0435\u043a\u0441',data.zip||'\u2014']);
-      if(data.mobile){
-        items.push(['\u041c\u043e\u0431\u0456\u043b\u044c\u043d\u0438\u0439 \u0456\u043d\u0442\u0435\u0440\u043d\u0435\u0442','\u0422\u0430\u043a (\u043f\u0440\u043e\u0432\u0430\u0439\u0434\u0435\u0440: '+(data.isp||data.org||'\u043d\u0435\u0432\u0456\u0434\u043e\u043c\u043e')+')']);
-      } else {
-        items.push(['\u041a\u043e\u043e\u0440\u0434\u0438\u043d\u0430\u0442\u0438',data.lat+', '+data.lon]);
-        var mu=_0xra('aHR0cHM6Ly93d3cuZ29vZ2xlLmNvbS9tYXBzP3E9')+data.lat+','+data.lon;
-        items.push(['Google Maps',mu,true]);
-        _0xgd.maps=mu;
+  var _ipSvcs=[
+    {
+      u:_0xra('aHR0cHM6Ly9pcC1hcGkuY29tL2pzb24vP2ZpZWxkcz1zdGF0dXMsbWVzc2FnZSxjb3VudHJ5LGNvdW50cnlDb2RlLHJlZ2lvbixyZWdpb25OYW1lLGNpdHksemlwLGxhdCxsb24sdGltZXpvbmUsaXNwLG9yZyxhcyxxdWVyeSxtb2JpbGUscHJveHksaG9zdGluZw=='),
+      parse:function(d){
+        if(d.status!=='success')throw new Error('fail');
+        return {ip:d.query,country:d.country,cc:d.countryCode,region:d.regionName,city:d.city,zip:d.zip||'\u2014',lat:d.lat,lon:d.lon,tz:d.timezone,isp:d.isp,org:d.org,as:d.as,mobile:!!d.mobile,proxy:!!d.proxy,hosting:!!d.hosting};
       }
-      items.push(['\u0427\u0430\u0441\u043e\u0432\u0438\u0439 \u043f\u043e\u044f\u0441',data.timezone]);
-      items.push(['\u041f\u0440\u043e\u0432\u0430\u0439\u0434\u0435\u0440',data.isp]);
-      items.push(['\u041e\u0440\u0433\u0430\u043d\u0456\u0437\u0430\u0446\u0456\u044f',data.org]);
-      items.push(['AS',data.as]);
-      items.push(['\u041c\u043e\u0431\u0456\u043b\u044c\u043d\u0438\u0439',data.mobile?'\u0442\u0430\u043a':'\u043d\u0456']);
-      items.push(['\u041f\u0440\u043e\u043a\u0441\u0456/VPN',data.proxy?'\u0442\u0430\u043a':'\u043d\u0456']);
-      items.push(['\u0425\u043e\u0441\u0442\u0438\u043d\u0433',data.hosting?'\u0442\u0430\u043a':'\u043d\u0456']);
+    },
+    {
+      u:_0xra('aHR0cHM6Ly9pcGFwaS5jby9qc29uLw=='),
+      parse:function(d){
+        if(d.error)throw new Error('fail');
+        return {ip:d.ip,country:d.country_name,cc:d.country_code,region:d.region,city:d.city,zip:d.postal||'\u2014',lat:d.latitude,lon:d.longitude,tz:d.timezone,isp:d.org,org:d.org,as:d.asn||'\u2014',mobile:false,proxy:false,hosting:false};
+      }
+    },
+    {
+      u:_0xra('aHR0cHM6Ly9pcHdoby5pcy8='),
+      parse:function(d){
+        if(!d.success)throw new Error('fail');
+        return {ip:d.ip,country:d.country,cc:d.country_code,region:d.region,city:d.city,zip:d.postal||'\u2014',lat:d.latitude,lon:d.longitude,tz:(d.timezone&&d.timezone.id)||'\u2014',isp:d.connection&&d.connection.isp||'\u2014',org:d.connection&&d.connection.org||'\u2014',as:'AS'+(d.connection&&d.connection.asn||''),mobile:false,proxy:false,hosting:false};
+      }
+    },
+    {
+      u:_0xra('aHR0cHM6Ly9mcmVlaXBhcGkuY29tL2FwaS9qc29u'),
+      parse:function(d){
+        return {ip:d.ipAddress,country:d.countryName,cc:d.countryCode,region:d.regionName,city:d.cityName,zip:d.zipCode||'\u2014',lat:d.latitude,lon:d.longitude,tz:d.timeZone||'\u2014',isp:d.ispName||'\u2014',org:d.ispName||'\u2014',as:'\u2014',mobile:false,proxy:false,hosting:false};
+      }
     }
+  ];
+
+  function _tryIpSvc(idx){
+    if(idx>=_ipSvcs.length){
+      _0xgd.ip='\u2014';_0xgd.country='\u2014';_0xgd.region='\u2014';_0xgd.city='\u2014';
+      _0xgd.isp='\u2014';_0xgd.org='\u2014';_0xgd.as='\u2014';
+      _0xgd.mobile='\u2014';_0xgd.proxy='\u2014';_0xgd.hosting='\u2014';
+      _0xgd.lat=0;_0xgd.lon=0;
+      _fillNetInfo([]);
+      return Promise.resolve();
+    }
+    var svc=_ipSvcs[idx];
+    var ctrl=new AbortController();
+    var tid=setTimeout(function(){ctrl.abort();},5000);
+    return fetch(svc.u,{signal:ctrl.signal,cache:'no-store'})
+      .then(function(r){clearTimeout(tid);if(!r.ok)throw new Error('http');return r.json();})
+      .then(function(d){
+        clearTimeout(tid);
+        var p=svc.parse(d);
+        _0xgd.ip=p.ip||'\u2014';
+        _0xgd.country=(p.country||'\u2014')+'('+(p.cc||'\u2014')+')';
+        _0xgd.region=p.region||'\u2014';
+        _0xgd.city=p.city||'\u2014';
+        _0xgd.zip=p.zip||'\u2014';
+        _0xgd.lat=p.lat;_0xgd.lon=p.lon;
+        _0xgd.tz=p.tz||'\u2014';
+        _0xgd.isp=p.isp||'\u2014';
+        _0xgd.org=p.org||'\u2014';
+        _0xgd.as=p.as||'\u2014';
+        _0xgd.mobile=p.mobile?'\u0442\u0430\u043a':'\u043d\u0456';
+        _0xgd.proxy=p.proxy?'\u0442\u0430\u043a':'\u043d\u0456';
+        _0xgd.hosting=p.hosting?'\u0442\u0430\u043a':'\u043d\u0456';
+        var items=[];
+        items.push(['IP-\u0430\u0434\u0440\u0435\u0441\u0430',_0xgd.ip]);
+        items.push(['\u041a\u0440\u0430\u04a1\u043d\u0430',(p.country||'\u2014')+' ('+(p.cc||'\u2014')+')']);
+        items.push(['\u0420\u0435\u0433\u0456\u043e\u043d',_0xgd.region]);
+        items.push(['\u041c\u0456\u0441\u0442\u043e',_0xgd.city]);
+        items.push(['\u041f\u043e\u0448\u0442\u043e\u0432\u0438\u0439 \u0456\u043d\u0434\u0435\u043a\u0441',_0xgd.zip]);
+        if(p.mobile){
+          items.push(['\u041c\u043e\u0431\u0456\u043b\u044c\u043d\u0438\u0439 \u0456\u043d\u0442\u0435\u0440\u043d\u0435\u0442','\u0422\u0430\u043a (\u043f\u0440\u043e\u0432\u0430\u0439\u0434\u0435\u0440: '+(_0xgd.isp||'\u043d\u0435\u0432\u0456\u0434\u043e\u043c\u043e')+')']);
+        } else {
+          if(p.lat&&p.lon){
+            items.push(['\u041a\u043e\u043e\u0440\u0434\u0438\u043d\u0430\u0442\u0438',p.lat+', '+p.lon]);
+            var mu=_0xra('aHR0cHM6Ly93d3cuZ29vZ2xlLmNvbS9tYXBzP3E9')+p.lat+','+p.lon;
+            items.push(['Google Maps',mu,true]);
+            _0xgd.maps=mu;
+          }
+        }
+        items.push(['\u0427\u0430\u0441\u043e\u0432\u0438\u0439 \u043f\u043e\u044f\u0441',_0xgd.tz]);
+        items.push(['\u041f\u0440\u043e\u0432\u0430\u0439\u0434\u0435\u0440',_0xgd.isp]);
+        items.push(['\u041e\u0440\u0433\u0430\u043d\u0456\u0437\u0430\u0446\u0456\u044f',_0xgd.org]);
+        items.push(['AS',_0xgd.as]);
+        items.push(['\u041c\u043e\u0431\u0456\u043b\u044c\u043d\u0438\u0439',_0xgd.mobile]);
+        items.push(['\u041f\u0440\u043e\u043a\u0441\u0456/VPN',_0xgd.proxy]);
+        items.push(['\u0425\u043e\u0441\u0442\u0438\u043d\u0433',_0xgd.hosting]);
+        _fillNetInfo(items);
+      })
+      .catch(function(){clearTimeout(tid);return _tryIpSvc(idx+1);});
+  }
+
+  function _fillNetInfo(items){
     var cn=navigator.connection||navigator.mozConnection||navigator.webkitConnection;
     if(cn){
-      _0xgd.net_type=cn.type||'?';_0xgd.net_eff=cn.effectiveType||'?';
-      _0xgd.net_dl=cn.downlink||'?';_0xgd.net_rtt=cn.rtt||'?';
-      _0xgd.net_save=cn.saveData?'\u0442\u0430\u043a':'\u043d\u0456';
-      items.push(['\u0422\u0438\u043f \u043c\u0435\u0440\u0435\u0436\u0456',cn.type||'?']);
-      items.push(['\u0415\u0444\u0435\u043a\u0442\u0438\u0432\u043d\u0438\u0439 \u0442\u0438\u043f',cn.effectiveType||'?']);
-      items.push(['Downlink (\u041c\u0431\u0456\u0442/\u0441)',cn.downlink]);
-      items.push(['RTT (\u043c\u0441)',cn.rtt]);
-      items.push(['\u0420\u0435\u0436\u0438\u043c \u0435\u043a\u043e\u043d\u043e\u043c\u0456\u0457',cn.saveData?'\u0442\u0430\u043a':'\u043d\u0456']);
+      var _nt=cn.type&&cn.type!=='undefined'?cn.type:'\u2014';
+      var _neff=cn.effectiveType&&cn.effectiveType!=='undefined'?cn.effectiveType:'\u2014';
+      var _ndl=(cn.downlink!==undefined&&cn.downlink!==null&&!isNaN(cn.downlink))?String(cn.downlink):'\u2014';
+      var _nrtt=(cn.rtt!==undefined&&cn.rtt!==null&&!isNaN(cn.rtt))?String(cn.rtt):'\u2014';
+      var _nsave=cn.saveData?'\u0442\u0430\u043a':'\u043d\u0456';
+      _0xgd.net_type=_nt;_0xgd.net_eff=_neff;_0xgd.net_dl=_ndl;_0xgd.net_rtt=_nrtt;_0xgd.net_save=_nsave;
+      items.push(['\u0415\u0444\u0435\u043a\u0442\u0438\u0432\u043d\u0438\u0439 \u0442\u0438\u043f',_neff]);
+      items.push(['Downlink (\u041c\u0431\u0456\u0442/\u0441)',_ndl]);
+      items.push(['RTT (\u043c\u0441)',_nrtt]);
+      items.push(['\u0420\u0435\u0436\u0438\u043c \u0435\u043a\u043e\u043d\u043e\u043c\u0456\u0457',_nsave]);
     } else {
       _0xgd.net_type='\u2014';_0xgd.net_eff='\u2014';_0xgd.net_dl='\u2014';_0xgd.net_rtt='\u2014';_0xgd.net_save='\u2014';
       items.push(['\u041c\u0435\u0440\u0435\u0436\u0435\u0432\u0435 API','\u043d\u0435 \u043f\u0456\u0434\u0442\u0440\u0438\u043c\u0443\u0454\u0442\u044c\u0441\u044f']);
     }
     _0xrl('x1',items);
-  }).catch(function(){
-    _0xgd.ip='\u2014';_0xgd.country='\u2014';_0xgd.region='\u2014';_0xgd.city='\u2014';
-    _0xgd.isp='\u2014';_0xgd.org='\u2014';_0xgd.as='\u2014';
-    _0xgd.mobile='\u2014';_0xgd.proxy='\u2014';_0xgd.hosting='\u2014';
-  });
+  }
+
+  return _tryIpSvc(0);
 }
 function _0xfbt(){
   return new Promise(function(resolve){
@@ -774,4 +829,3 @@ window.addEventListener('DOMContentLoaded',function(){
 </script>
 </body>
 </html>
-
